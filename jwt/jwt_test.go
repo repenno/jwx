@@ -150,7 +150,7 @@ const aLongLongTimeAgo = 233431200
 const aLongLongTimeAgoString = "233431200"
 
 func TestUnmarshal(t *testing.T) {
-	testcases := []struct {
+	testCases := []struct {
 		Title        string
 		Source       string
 		Expected     func() *jwt.Token
@@ -160,9 +160,12 @@ func TestUnmarshal(t *testing.T) {
 			Title:  "single aud",
 			Source: `{"aud":"foo"}`,
 			Expected: func() *jwt.Token {
-				t := jwt.New()
-				t.Set("aud", "foo")
-				return t
+				token := jwt.New()
+				err := token.Set(jwt.AudienceKey, "foo")
+				if err != nil {
+					t.Fatalf("Failed to set key:%s", jwt.AudienceKey)
+				}
+				return token
 			},
 			ExpectedJSON: `{"aud":["foo"]}`,
 		},
@@ -170,9 +173,12 @@ func TestUnmarshal(t *testing.T) {
 			Title:  "multiple aud's",
 			Source: `{"aud":["foo","bar"]}`,
 			Expected: func() *jwt.Token {
-				t := jwt.New()
-				t.Set("aud", []string{"foo", "bar"})
-				return t
+				token := jwt.New()
+				err := token.Set(jwt.AudienceKey, []string{"foo", "bar"})
+				if err != nil {
+					t.Fatalf("Failed to set key:%s", jwt.AudienceKey)
+				}
+				return token
 			},
 			ExpectedJSON: `{"aud":["foo","bar"]}`,
 		},
@@ -180,15 +186,18 @@ func TestUnmarshal(t *testing.T) {
 			Title:  "issuedAt",
 			Source: `{"` + jwt.IssuedAtKey + `":` + aLongLongTimeAgoString + `}`,
 			Expected: func() *jwt.Token {
-				t := jwt.New()
-				t.Set(jwt.IssuedAtKey, aLongLongTimeAgo)
-				return t
+				token := jwt.New()
+				err := token.Set(jwt.IssuedAtKey, aLongLongTimeAgo)
+				if err != nil {
+					t.Fatalf("Failed to set key:%s", jwt.IssuedAtKey)
+				}
+				return token
 			},
 			ExpectedJSON: `{"` + jwt.IssuedAtKey + `":` + aLongLongTimeAgoString + `}`,
 		},
 	}
 
-	for _, tc := range testcases {
+	for _, tc := range testCases {
 		t.Run(tc.Title, func(t *testing.T) {
 			var token jwt.Token
 			if !assert.NoError(t, json.Unmarshal([]byte(tc.Source), &token), `json.Unmarshal should succeed`) {

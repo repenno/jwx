@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"encoding/json"
-	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -67,16 +66,4 @@ func (n *NumericDate) MarshalJSON() ([]byte, error) {
 		return json.Marshal(nil)
 	}
 	return json.Marshal(n.Unix())
-}
-
-// UnmarshalJSON translates between JSON NumericDate and internal representation
-// See https://tools.ietf.org/html/rfc7519#page-6
-func (n *NumericDate) UnmarshalJSON(b []byte) error {
-	i, err := strconv.ParseInt(string(b[:]), 10, 64)
-	if err != nil {
-		return errors.Errorf(`invalid type %T`, b)
-	}
-	tm := time.Unix(i, 0)
-	n.Time = tm.UTC()
-	return nil
 }
